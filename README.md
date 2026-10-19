@@ -1,19 +1,18 @@
 # 📺 FreeTV
 
-8000+ free live TV channels from 200+ countries — news, sports, movies, music, kids and more. No signup, free forever.
+India ke free live TV channels — Hindi, Marathi, English aur Sports. Bina signup, bilkul muft.
 
 **Live site:** https://legendrockkk.github.io/freetv/
 
-## How it works
+## How it works (v2 — curated)
 
-- Channel data loads **live at runtime** from [iptv-org](https://iptv-org.github.io/iptv) (CORS-open `.m3u` playlists), so the list is always fresh — nothing to rebuild.
-- `data/countries.json` is a build-time snapshot of the country list (200+ countries).
-- `data/languages.json` is a build-time snapshot of the content-language list (207 languages, with channel counts) parsed from the iptv-org playlist docs.
-- App UI is bilingual — English + Hindi, auto-detected from the browser, switchable from the header (🌐 button), saved in localStorage.
-- Playback uses [hls.js](https://github.com/video-dev/hls.js) for HLS streams, native video otherwise.
-- Favorites are saved in the browser (localStorage).
+- Sirf **Indian channels**, 4 tabs: **हिंदी** (258), **मराठी** (22), **English** (66), **🏆 Sports** (3).
+- Har stream ko build-time par probe kiya gaya — sirf kaam karne wale `https://` streams hi list me hain (dead/`http://`/DASH streams hata diye gaye). Data: `data/{hindi,marathi,english,sports}.json`, last checked `data/meta.json` me.
+- Search, category chips, ★ favorites (localStorage), EN/HI app UI (auto-detect, 🌐 toggle).
+- Player: fullscreen video player — click karte hi fullscreen, ✕ se back, top bar auto-hide.
 
 ## Notes
 
-- A few older streams use plain `http://` links and are blocked by browsers on secure sites — the player says so instead of hanging.
-- All streams belong to their respective owners; this site is only a player UI over public free streams.
+- Free me Indian sports streams bahut kam hain (DD Sports waghaira) — isliye Sports tab chhota hai.
+- Streams [iptv-org](https://iptv-org.github.io/iptv) ke public free streams hain; sab channels unke malikon ke hain.
+- Playback: [hls.js](https://github.com/video-dev/hls.js) for HLS, native otherwise.
