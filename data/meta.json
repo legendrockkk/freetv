@@ -1,9 +1,10 @@
 {
  "checked": "2026-10-19",
  "counts": {
-  "hindi": 258,
+  "hindi": 359,
   "marathi": 22,
   "english": 66,
-  "sports": 3
+  "sports": 221,
+  "hindi_working": 279
  }
 }

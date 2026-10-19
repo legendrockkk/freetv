@@ -126,6 +126,11 @@ main { max-width: 1100px; margin: 0 auto; padding: 4px 16px 0; }
   background: rgba(13,15,22,.75); color: #fff; border-radius: 6px; padding: 3px 7px;
 }
 .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: blink 1.2s infinite; }
+.bwarn {
+  position: absolute; bottom: 8px; right: 8px; z-index: 2;
+  font-size: 11px; line-height: 1; background: rgba(13,15,22,.85); color: #ffb020;
+  border: 1px solid rgba(255,176,32,.55); border-radius: 6px; padding: 3px 6px;
+}
 @keyframes blink { 50% { opacity: .25; } }
 .empty { grid-column: 1 / -1; text-align: center; color: var(--mut); padding: 60px 20px; font-size: 15px; line-height: 1.7; }
 

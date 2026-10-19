@@ -16,9 +16,12 @@
       favs_empty: "★ No favorites yet — tap ★ on any channel.",
       err_slow: "⏳ Channel isn't loading — the stream may be down. Try another.",
       err_dead: "⚠️ This stream isn't working. Try another channel.",
+      err_http: "⚠️ This channel uses an unsecured (http) stream — browsers block it on this site. Try another channel.",
+      err_dash: "⚠️ This channel is DASH (.mpd) format — this app only plays HLS (.m3u8) streams.",
+      blocked_tip: "May not play on this site",
       cat_all: "All",
       tab_sports: "🏆 Sports",
-      sub: "✓ {n} working Indian channels",
+      sub: "{n} channels • {d} working",
       lang_btn: "🌐 हिं"
     },
     hi: {
@@ -30,9 +33,12 @@
       favs_empty: "★ Abhi koi pasandida channel nahi — kisi channel pe ★ dabao.",
       err_slow: "⏳ Channel load nahi ho raha — stream down ho sakta hai.",
       err_dead: "⚠️ Ye stream nahi chal raha. Koi aur try karo.",
+      err_http: "⚠️ Ye channel http stream use karta hai — browser is site par use block kar deta hai. Koi aur try karo.",
+      err_dash: "⚠️ Ye channel DASH (.mpd) format me hai — ye app sirf HLS (.m3u8) chalata hai.",
+      blocked_tip: "Is site par nahi chal sakta",
       cat_all: "Sab",
       tab_sports: "🏆 खेल",
-      sub: "✓ {n} chalte hue Indian channel",
+      sub: "{n} channel • {d} chalte hue",
       lang_btn: "🌐 EN"
     }
   };
@@ -79,9 +85,12 @@
     applyFilters();
   }
   function updateSub() {
-    var total = Object.keys(cache).reduce(function (s, k) { return s + cache[k].length; }, 0);
+    var total = 0, working = 0;
+    Object.keys(cache).forEach(function (k) {
+      cache[k].forEach(function (ch) { total++; if (!ch.s || ch.s === "ok") working++; });
+    });
     $("subLine").innerHTML = total
-      ? '<span class="ok">●</span> ' + esc(t("sub", total.toLocaleString("en-IN")))
+      ? '<span class="ok">●</span> ' + esc(t("sub", total.toLocaleString("en-IN"), working.toLocaleString("en-IN")))
       : "";
   }
 
@@ -169,6 +178,8 @@
     var isFav = !!favs[ch.u];
     var q = qualityOf(ch.n);
     var letter = esc((ch.n || "?").trim().charAt(0).toUpperCase());
+    var warn = (ch.s && ch.s !== "ok")
+      ? '<span class="bwarn" title="' + esc(t("blocked_tip")) + '">⚠</span>' : "";
     return '<div class="card" data-url="' + esc(ch.u) + '">' +
       '<div class="logo"><span class="letter">' + letter + "</span>" +
       (ch.l ? '<img loading="lazy" src="' + esc(ch.l) + '" alt="" onerror="this.remove()">' : "") + "</div>" +
@@ -176,7 +187,7 @@
       '<div class="cmeta">' + (q ? '<span class="q">' + esc(q) + "</span>" : "") +
       '<span class="g">' + esc(ch.g) + "</span></div>" +
       '<button class="fav' + (isFav ? " on" : "") + '" data-fav="' + esc(ch.u) + '" aria-label="favorite">★</button>' +
-      '<span class="live"><i></i>LIVE</span></div>';
+      '<span class="live"><i></i>LIVE</span>' + warn + "</div>";
   }
 
   function renderMore() {
@@ -216,7 +227,7 @@
     }
     if (!ch) { for (var k in cache) { var arr = cache[k]; for (var j = 0; j < arr.length; j++) if (arr[j].u === url) { ch = arr[j]; break; } if (ch) break; } }
     if (!ch) return;
-    if (favs[url]) delete favs[url]; else favs[url] = { n: ch.n, l: ch.l, g: ch.g, u: ch.u };
+    if (favs[url]) delete favs[url]; else favs[url] = { n: ch.n, l: ch.l, g: ch.g, u: ch.u, s: ch.s };
     saveFavs();
     document.querySelectorAll("[data-fav]").forEach(function (b) {
       if (b.getAttribute("data-fav") === url) b.classList.toggle("on", !!favs[url]);
@@ -245,6 +256,9 @@
     $("player").classList.add("open");
     document.body.style.overflow = "hidden";
     showBar();
+
+    if (ch.s === "http") { playerError(t("err_http")); return; }
+    if (ch.s === "dash") { playerError(t("err_dash")); return; }
 
     var video = $("video");
     if (hls) { hls.destroy(); hls = null; }
