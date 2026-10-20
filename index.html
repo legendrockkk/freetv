@@ -34,6 +34,7 @@
   <button data-tab="marathi">मराठी</button>
   <button data-tab="english">English</button>
   <button data-tab="sports" id="tabSports">🏆 Sports</button>
+  <button data-tab="movies" id="tabMovies">🎬 Movies</button>
 </nav>
 
 <div class="cats" id="cats"></div>
@@ -44,6 +45,21 @@
   <div id="grid"></div>
   <div id="sentinel" style="height:1px"></div>
 </main>
+
+<div id="movieModal" role="dialog" aria-modal="true" aria-label="Movie details">
+  <div class="mbox">
+    <button id="mClose" aria-label="Close">✕</button>
+    <img id="mPoster" alt="">
+    <div class="minfo">
+      <div id="mTitle"></div>
+      <div id="mMeta"></div>
+      <div id="mGenres"></div>
+      <p id="mPlot"></p>
+      <div id="mWatchLabel"></div>
+      <div id="mSources"></div>
+    </div>
+  </div>
+</div>
 
 <div id="player" role="dialog" aria-modal="true" aria-label="Video player">
   <video id="video" controls playsinline></video>
