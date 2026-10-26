@@ -3,7 +3,7 @@
   "use strict";
 
   var PAGE_SIZE = 120;
-  var TABS = ["hindi", "marathi", "english", "sports", "movies"];
+  var TABS = ["hindi", "marathi", "english", "sports", "movies", "shows"];
 
   /* ---------- i18n ---------- */
   var I18N = {
@@ -23,6 +23,10 @@
       tab_sports: "🏆 Sports",
       tab_movies: "🎬 Movies",
       movies_n: "{n} movies",
+      tab_shows: "📺 Shows",
+      shows_n: "{n} shows",
+      info_on: "Details:",
+      src_info: "Info",
       watch_on: "Watch on:",
       src_sub: "Subscription",
       src_free: "Free",
@@ -47,6 +51,10 @@
       tab_sports: "🏆 खेल",
       tab_movies: "🎬 फिल्में",
       movies_n: "{n} फिल्में",
+      tab_shows: "📺 शोज़",
+      shows_n: "{n} शोज़",
+      info_on: "जानकारी:",
+      src_info: "जानकारी",
       watch_on: "यहाँ देखें:",
       src_sub: "Subscription",
       src_free: "Free",
@@ -83,6 +91,7 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   function qualityOf(name) { var m = String(name).match(/(\d{3,4}p)/); return m ? m[1] : ""; }
+  function isOtt() { return state.tab === "movies" || state.tab === "shows"; }
 
   /* ---------- language (UI) ---------- */
   function setLang(l) {
@@ -94,6 +103,7 @@
     $("loadingText").textContent = t("loading");
     $("tabSports").textContent = t("tab_sports");
     $("tabMovies").textContent = t("tab_movies");
+    $("tabShows").textContent = t("tab_shows");
     document.documentElement.lang = l === "hi" ? "hi" : "en";
     updateSub();
     buildCategories();
@@ -102,7 +112,7 @@
   function updateSub() {
     var total = 0, working = 0;
     Object.keys(cache).forEach(function (k) {
-      if (k === "movies") return;
+      if (k === "movies" || k === "shows") return;
       cache[k].forEach(function (ch) { total++; if (!ch.s || ch.s === "ok") working++; });
     });
     $("subLine").innerHTML = total
@@ -116,8 +126,8 @@
     state.category = "All";
     state.favsOnly = false;
     $("favToggle").classList.remove("active");
-    document.body.classList.toggle("on-movies", tab === "movies");
-    $("grid").classList.toggle("movies", tab === "movies");
+    document.body.classList.toggle("on-movies", tab === "movies" || tab === "shows");
+    $("grid").classList.toggle("movies", tab === "movies" || tab === "shows");
     document.querySelectorAll("#tabs button").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-tab") === tab);
     });
@@ -153,7 +163,7 @@
   /* ---------- categories ---------- */
   function buildCategories() {
     var counts = {};
-    if (state.tab === "movies") {
+    if (isOtt()) {
       state.channels.forEach(function (ch) { (ch.gn || []).forEach(function (g) { counts[g] = (counts[g] || 0) + 1; }); });
     } else {
       state.channels.forEach(function (ch) { counts[ch.g] = (counts[ch.g] || 0) + 1; });
@@ -182,7 +192,7 @@
     var pool = state.favsOnly ? Object.keys(favs).map(function (k) { return favs[k]; }) : state.channels;
     state.filtered = pool.filter(function (ch) {
       if (state.category !== "All") {
-        if (state.tab === "movies") { if ((ch.gn || []).indexOf(state.category) === -1) return false; }
+        if (isOtt()) { if ((ch.gn || []).indexOf(state.category) === -1) return false; }
         else if (ch.g !== state.category) return false;
       }
       var name = (ch.n || ch.t || "").toLowerCase();
@@ -191,7 +201,7 @@
     });
     state.rendered = 0;
     $("grid").innerHTML = "";
-    $("count").textContent = t(state.tab === "movies" ? "movies_n" : "channels", state.filtered.length.toLocaleString("en-IN"));
+    $("count").textContent = t(isOtt() ? (state.tab === "shows" ? "shows_n" : "movies_n") : "channels", state.filtered.length.toLocaleString("en-IN"));
     if (!state.filtered.length) {
       $("grid").innerHTML = '<div class="empty">' +
         (state.favsOnly && !Object.keys(favs).length ? t("favs_empty") : t("empty")) + "</div>";
@@ -230,7 +240,7 @@
     var next = Math.min(state.rendered + PAGE_SIZE, state.filtered.length);
     var html = "";
     for (var i = state.rendered; i < next; i++) {
-      html += state.tab === "movies" ? movieCardHTML(state.filtered[i]) : cardHTML(state.filtered[i]);
+      html += isOtt() ? movieCardHTML(state.filtered[i]) : cardHTML(state.filtered[i]);
     }
     grid.insertAdjacentHTML("beforeend", html);
     state.rendered = next;
@@ -291,10 +301,10 @@
     $("mMeta").textContent = meta.join(" • ");
     $("mGenres").textContent = (m.gn || []).join(" · ");
     $("mPlot").textContent = m.plot || "";
-    $("mWatchLabel").textContent = t("watch_on");
+    $("mWatchLabel").textContent = t(state.tab === "shows" ? "info_on" : "watch_on");
     var html = "";
     (m.s || []).forEach(function (s) {
-      var lbl = s.ty === "sub" ? t("src_sub") : s.ty === "free" ? t("src_free") : s.ty === "rent" ? t("src_rent") : s.ty === "buy" ? t("src_buy") : s.ty;
+      var lbl = s.ty === "sub" ? t("src_sub") : s.ty === "free" ? t("src_free") : s.ty === "rent" ? t("src_rent") : s.ty === "buy" ? t("src_buy") : s.ty === "info" ? t("src_info") : s.ty;
       html += '<a class="srcbtn" href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.n) +
         "<span>" + esc(lbl) + (s.f ? " • " + esc(s.f) : "") + "</span></a>";
     });
